@@ -15,7 +15,7 @@ class SshShellCommand(private val sshProfile: String) : SshCommand {
             .redirectError(ProcessBuilder.Redirect.INHERIT)
             .start()
         val input = BufferedReader(InputStreamReader(process.inputStream))
-        process.waitFor(2, TimeUnit.SECONDS)
+        process.waitFor(5, TimeUnit.SECONDS)
         return input.readLines().joinToString()
     }
 
