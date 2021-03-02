@@ -12,9 +12,11 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation("org.json:json:20201115")
+}
 
-
-tasks.withType<KotlinCompile>() {
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
 
