@@ -36,8 +36,7 @@ class PatchListHolder(val sshCommand: SshCommand, initialPatch: String) {
     }
 
     private fun initPatchList(patchId: Int) {
-        val json = sshCommand(patchId.toString())
-            .toJsonObject()
+        val json = sshCommand(patchId.toString()).toJsonObject()
         list.add(json)
         print("-")
         try {

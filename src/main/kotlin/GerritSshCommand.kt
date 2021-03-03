@@ -19,7 +19,5 @@ class GerritSshCommand(private val sshProfile: String) : SshCommand {
         return input.readLines().joinToString()
     }
 
-    override operator fun invoke(query: String): String {
-        return execShellSsh(query)
-    }
+    override operator fun invoke(query: String) = execShellSsh(query)
 }
