@@ -31,5 +31,14 @@ tasks {
         }
         // here zip stuff found in runtimeClasspath:
         from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+        //Convert jar file to the directly executable, without the need of 'java -jar' prefix
+        doLast {
+            File("$buildDir/libs/${project.name}")
+                .let {
+                    it.writeText("#!/usr/bin/java -jar\n")
+                    it.appendBytes(archiveFile.get().asFile.readBytes())
+                    it.setExecutable(true)
+                }
+        }
     }
 }

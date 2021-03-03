@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit
 const val COMMAND_TEMPLATE: String =
     "ssh %s gerrit query --dependencies --submit-records --format json %s"
 
-class SshShellCommand(private val sshProfile: String) : SshCommand {
+class GerritSshCommand(private val sshProfile: String) : SshCommand {
     private fun execShellSsh(command: String): String {
         val cmdArgs = COMMAND_TEMPLATE.format(sshProfile, command)
             .split(" ")

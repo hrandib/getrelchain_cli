@@ -5,7 +5,7 @@ import kotlin.system.exitProcess
 fun String.toJsonObject() = JSONObject(this)
 
 fun main(args: Array<String>) {
-    val cmd = SshShellCommand(args[0])
+    val cmd = GerritSshCommand(args[0])
     val holder = PatchListHolder(cmd, args[1])
     if (holder.isEmpty()) {
         println("Something is going wrong, nothing to print")
@@ -18,7 +18,6 @@ fun main(args: Array<String>) {
         val status = submitRecord.getString("status")
         println("$url  $subj  $status")
     }
-//  println(holder[2].toString(4))
 }
 
 class PatchListHolder(val sshCommand: SshCommand, initialPatch: String) {
@@ -43,7 +42,7 @@ class PatchListHolder(val sshCommand: SshCommand, initialPatch: String) {
         print("-")
         try {
             val lowerPatchId =
-                (json.getJSONArray("dependsOn")[0] as JSONObject).get("number") as Int
+                (json.getJSONArray("dependsOn")[0] as JSONObject).getInt("number")
             initPatchList(lowerPatchId)
         } catch (e: JSONException) {
             println("> Finished")
