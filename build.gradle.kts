@@ -15,7 +15,7 @@ compileKotlin.kotlinOptions {
 }
 
 group = "me.dmytro"
-version = "0.1"
+version = "0.2"
 
 repositories {
     mavenCentral()
@@ -23,6 +23,7 @@ repositories {
 
 dependencies {
     implementation("org.json:json:20201115")
+    implementation("de.vandermeer:asciitable:0.3.2")
 }
 
 application {
@@ -65,7 +66,7 @@ tasks {
     }
     register("Unlink") {
         doLast {
-            val homeDir = System.getenv("HOME");
+            val homeDir = System.getenv("HOME")
             deleteIfExists(withPath("${homeDir}/.local/bin/${project.name}"))
         }
     }

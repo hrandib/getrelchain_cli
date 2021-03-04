@@ -3,7 +3,7 @@ import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
 
 const val COMMAND_TEMPLATE: String =
-    "ssh %s gerrit query --dependencies --submit-records --format json %s"
+    "ssh %s gerrit query --dependencies --all-approvals --submit-records --format json %s"
 
 class GerritSshCommand(private val sshProfile: String) : SshCommand {
     private fun execShellSsh(command: String): String {
