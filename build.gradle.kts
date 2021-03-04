@@ -53,11 +53,14 @@ tasks {
     register("Link") {
         dependsOn(withType<Jar>())
         doLast {
-            val homeDir = System.getenv("HOME");
-            createSymbolicLink(
-                withPath("${homeDir}/.local/bin/${project.name}"),
-                withPath("$buildDir/libs/${project.name}")
-            )
+            val homeDir = System.getenv("HOME")
+            val linkPath = "${homeDir}/.local/bin/${project.name}"
+            if (!File(linkPath).exists()) {
+                createSymbolicLink(
+                    withPath(linkPath),
+                    withPath("$buildDir/libs/${project.name}")
+                )
+            }
         }
     }
     register("Unlink") {
