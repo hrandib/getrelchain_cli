@@ -1,7 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.nio.file.Files.createSymbolicLink
 import java.nio.file.Files.deleteIfExists
-
 import java.nio.file.Path.of as withPath
 
 plugins {
@@ -19,6 +18,7 @@ version = "0.2"
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -38,7 +38,6 @@ tasks {
         manifest {
             attributes["Main-Class"] = application.mainClass
         }
-        // here zip stuff found in runtimeClasspath:
         from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
         //Convert jar file to the directly executable, without the need of 'java -jar' prefix
         doLast {
