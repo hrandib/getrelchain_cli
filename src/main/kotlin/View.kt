@@ -16,20 +16,19 @@ class TableView(list: List<JSONObject>) : View(list) {
         for (item in patchList) {
             val url = item.getString("url")
             val subj = item.getString("subject")
-            var approvals: List<JSONObject>
-            try {
-                approvals = (item.getJSONArray("patchSets").last() as JSONObject)
+            var approvals = try {
+                (item.getJSONArray("patchSets").last() as JSONObject)
                     .getJSONArray("approvals")
                     .filterIsInstance<JSONObject>()
             } catch (e: JSONException) {
-                approvals = emptyList()
+                emptyList()
             }
             var tl = ""
             var cr = ""
             var lock = ""
             var ml = ""
             var sca = ""
-            for (approval in approvals.orEmpty()) {
+            for (approval in approvals) {
                 fun getType() = approval.getString("type")
                 fun getValue() = approval.getString("value")
                 when (getType()) {

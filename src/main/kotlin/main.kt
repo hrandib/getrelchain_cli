@@ -2,7 +2,7 @@ import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     if(args.isEmpty()) {
-        println("Usage:\r\t getrelchain [ssh profile] [patch id] [-r]")
+        println("Usage:\n\t getrelchain [ssh profile] [patch id] [-r]")
         exitProcess(1)
     }
     val cmd = GerritSshCommand(args[0])
