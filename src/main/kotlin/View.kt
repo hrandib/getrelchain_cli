@@ -14,7 +14,7 @@ class TableView(list: List<JSONObject>) : View(list) {
         t.addRow("URL", "Subject", "TL", "Review", "ML", "Lock")
         t.addRule()
         for (item in patchList) {
-            val url = item.getString("url")
+            val url = shortenUrl(item.getString("url"))
             val subj = item.getString("subject")
             val approvals = try {
                 (item.getJSONArray("patchSets").last() as JSONObject)
@@ -44,6 +44,12 @@ class TableView(list: List<JSONObject>) : View(list) {
         t.addRule()
         t.renderer.cwc = CWC_LongestLine()
         return t.render()
+    }
+
+    private fun shortenUrl(url: String): String {
+        val patchNumber = url.split("/").last()
+        val gerritSite = url.subSequence(0, url.indexOf("/c/"))
+        return "$gerritSite/$patchNumber"
     }
 }
 
