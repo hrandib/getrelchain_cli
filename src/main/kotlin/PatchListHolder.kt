@@ -9,12 +9,12 @@ class PatchListHolder(val sshCommand: SshCommand, initialPatch: String) {
     fun isEmpty() = list.isEmpty()
 
     init {
-        initPatchList(initialPatch.toInt())
+        initPatchList(initialPatch)
     }
 
-    private fun initPatchList(patchId: Int) {
+    private fun initPatchList(patchId: String) {
         fun printFinish() = println("> Finished")
-        val json = sshCommand(patchId.toString()).toJsonObject()
+        val json = sshCommand(Constants.GERRIT_PATCHLIST_QUERY, patchId).toJsonObject()
         if (json.getString("status") == "MERGED") {
             printFinish()
             return
@@ -23,7 +23,8 @@ class PatchListHolder(val sshCommand: SshCommand, initialPatch: String) {
         print("-")
         try {
             val lowerPatchId =
-                (json.getJSONArray("dependsOn")[0] as JSONObject).getInt("number")
+                (json.getJSONArray("dependsOn")[0] as JSONObject)
+                    .getInt("number").toString()
             initPatchList(lowerPatchId)
         } catch (e: JSONException) {
             printFinish()

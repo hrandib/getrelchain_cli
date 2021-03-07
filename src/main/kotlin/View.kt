@@ -11,11 +11,20 @@ class TableView(list: List<JSONObject>) : View(list) {
     override fun asString(): String {
         val t = AsciiTable()
         t.addRule()
-        t.addRow("URL", "Subject", "TL", "Review", "ML", "Lock")
+        t.addRow("URL", "Subject", "WIP", "TL", "Review", "ML", "Lock")
         t.addRule()
         for (item in patchList) {
             val url = shortenUrl(item.getString("url"))
             val subj = item.getString("subject")
+            val wip = try {
+                if (item.getBoolean("wip")) {
+                    "YES"
+                } else {
+                    ""
+                }
+            } catch (e: JSONException) {
+                ""
+            }
             val approvals = try {
                 (item.getJSONArray("patchSets").last() as JSONObject)
                     .getJSONArray("approvals")
@@ -39,7 +48,7 @@ class TableView(list: List<JSONObject>) : View(list) {
                     "SCA" -> sca += getValue() + " "
                 }
             }
-            t.addRow(url, subj, tl, cr, ml, lock)
+            t.addRow(url, subj, wip, tl, cr, ml, lock)
         }
         t.addRule()
         t.renderer.cwc = CWC_LongestLine()
@@ -48,8 +57,12 @@ class TableView(list: List<JSONObject>) : View(list) {
 
     private fun shortenUrl(url: String): String {
         val patchNumber = url.split("/").last()
-        val gerritSite = url.subSequence(0, url.indexOf("/c/"))
-        return "$gerritSite/$patchNumber"
+        val endIndex = url.indexOf("/c/")
+        return if (endIndex != -1) {
+            "${url.substring(0, endIndex)}/$patchNumber"
+        } else {
+            url
+        }
     }
 }
 

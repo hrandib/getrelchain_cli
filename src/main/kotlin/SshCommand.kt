@@ -1,3 +1,3 @@
 interface SshCommand {
-    operator fun invoke(query: String): String
+    operator fun invoke(query: String, arg: String): String
 }
