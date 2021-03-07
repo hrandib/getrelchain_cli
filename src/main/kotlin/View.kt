@@ -16,7 +16,7 @@ class TableView(list: List<JSONObject>) : View(list) {
         for (item in patchList) {
             val url = item.getString("url")
             val subj = item.getString("subject")
-            var approvals = try {
+            val approvals = try {
                 (item.getJSONArray("patchSets").last() as JSONObject)
                     .getJSONArray("approvals")
                     .filterIsInstance<JSONObject>()
@@ -32,7 +32,7 @@ class TableView(list: List<JSONObject>) : View(list) {
                 fun getType() = approval.getString("type")
                 fun getValue() = approval.getString("value")
                 when (getType()) {
-                    "Code Review" -> cr += getValue() + " "
+                    "Code-Review" -> cr += getValue() + " "
                     "Team-Lead" -> tl += getValue() + " "
                     "Patch-Set-Lock" -> lock += getValue() + " "
                     "Melco-Lead" -> ml += getValue() + " "
