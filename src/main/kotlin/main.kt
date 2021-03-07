@@ -26,6 +26,23 @@ class CliHandler : CliktCommand(printHelpOnEmptyArgs = true) {
             TableView(holder.list)
         }
         println(resultView.asString())
+
+        printSameTopic(cmd, holder.topicMap)
+    }
+}
+
+fun printSameTopic(cmd: SshCommand, topicMap: Map<String, List<Int>>) {
+    for ((topic, patchList) in topicMap) {
+        val sameTopicPatches = cmd(Constants.GERRIT_SAMETOPIC_QUERY, topic)
+            .split(", ")
+            .dropLast(1)
+            .map { it.toJsonObject() }
+        val withExcludedMainList = sameTopicPatches
+            .filter { !patchList.contains(it.getInt("number")) }
+        if (withExcludedMainList.isNotEmpty()) {
+            println("Common patches for topic \"$topic\":")
+            println(TableView(withExcludedMainList).asString())
+        }
     }
 }
 

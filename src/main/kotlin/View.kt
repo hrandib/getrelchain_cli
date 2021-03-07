@@ -11,27 +11,14 @@ class TableView(list: List<JSONObject>) : View(list) {
     override fun asString(): String {
         val t = AsciiTable()
         t.addRule()
-        t.addRow("URL", "Subject", "WIP", "TL", "Review", "ML", "Lock")
+        t.addRow("URL", "Subject", "Topic", "WIP", "TL", "Review", "ML", "Lock")
         t.addRule()
         for (item in patchList) {
-            val url = shortenUrl(item.getString("url"))
-            val subj = item.getString("subject")
-            val wip = try {
-                if (item.getBoolean("wip")) {
-                    "YES"
-                } else {
-                    ""
-                }
-            } catch (e: JSONException) {
-                ""
-            }
-            val approvals = try {
-                (item.getJSONArray("patchSets").last() as JSONObject)
-                    .getJSONArray("approvals")
-                    .filterIsInstance<JSONObject>()
-            } catch (e: JSONException) {
-                emptyList()
-            }
+            val url = shortenUrl(item.getString("url").orEmpty())
+            val subj = item.getString("subject").orEmpty()
+            val wip = getWip(item)
+            val topic = getTopic(item)
+            val approvals = getApprovals(item)
             var tl = ""
             var cr = ""
             var lock = ""
@@ -48,7 +35,7 @@ class TableView(list: List<JSONObject>) : View(list) {
                     "SCA" -> sca += getValue() + " "
                 }
             }
-            t.addRow(url, subj, wip, tl, cr, ml, lock)
+            t.addRow(url, subj, topic, wip, tl, cr, ml, lock)
         }
         t.addRule()
         t.renderer.cwc = CWC_LongestLine()
@@ -62,6 +49,36 @@ class TableView(list: List<JSONObject>) : View(list) {
             "${url.substring(0, endIndex)}/$patchNumber"
         } else {
             url
+        }
+    }
+
+    private fun getWip(item: JSONObject): String {
+        return try {
+            if (item.getBoolean("wip")) {
+                "YES"
+            } else {
+                ""
+            }
+        } catch (e: JSONException) {
+            ""
+        }
+    }
+
+    private fun getApprovals(item: JSONObject): List<JSONObject> {
+        return try {
+            (item.getJSONArray("patchSets").last() as JSONObject)
+                .getJSONArray("approvals")
+                .filterIsInstance<JSONObject>()
+        } catch (e: JSONException) {
+            emptyList()
+        }
+    }
+
+    private fun getTopic(item: JSONObject): String {
+        return try {
+            item.getString("topic")
+        } catch(e: JSONException) {
+            ""
         }
     }
 }

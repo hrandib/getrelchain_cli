@@ -6,7 +6,7 @@ object Constants {
     const val GERRIT_PATCHLIST_QUERY: String =
         "ssh %s gerrit query --dependencies --all-approvals --submit-records --format json %s"
     const val GERRIT_SAMETOPIC_QUERY: String =
-        """"ssh %s gerrit query --format json topic:"%s" status:open)"""
+        """ssh %s gerrit query --all-approvals --format json topic:"%s" status:open)"""
 }
 
 class GerritSshCommand(private val sshProfile: String) : SshCommand {
