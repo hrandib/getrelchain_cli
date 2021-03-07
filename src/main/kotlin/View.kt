@@ -3,6 +3,17 @@ import de.vandermeer.asciitable.CWC_LongestLine
 import org.json.JSONException
 import org.json.JSONObject
 
+enum class ViewType {
+    TABLE, RAW
+}
+
+fun getView(type: ViewType, list: List<JSONObject>) : View {
+    return when(type) {
+        ViewType.TABLE -> TableView(list)
+        ViewType.RAW -> RawView(list)
+    }
+}
+
 sealed class View(val patchList: List<JSONObject>) {
     abstract fun asString(): String
 }

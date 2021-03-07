@@ -20,18 +20,13 @@ class CliHandler : CliktCommand(printHelpOnEmptyArgs = true) {
             println("Something is going wrong, patch list is empty, nothing to print")
             exitProcess(2)
         }
-        val resultView: View = if (raw) {
-            RawView(holder.list)
-        } else {
-            TableView(holder.list)
-        }
-        println(resultView.asString())
-
-        printSameTopic(cmd, holder.topicMap)
+        val viewType = if (raw) ViewType.RAW else ViewType.TABLE
+        println(getView(viewType, holder.list).asString())
+        printSameTopic(viewType, cmd, holder.topicMap)
     }
 }
 
-fun printSameTopic(cmd: SshCommand, topicMap: Map<String, List<Int>>) {
+fun printSameTopic(viewType: ViewType, cmd: SshCommand, topicMap: Map<String, List<Int>>) {
     for ((topic, patchList) in topicMap) {
         val sameTopicPatches = cmd(Constants.GERRIT_SAMETOPIC_QUERY, topic)
             .split(", ")
@@ -40,8 +35,11 @@ fun printSameTopic(cmd: SshCommand, topicMap: Map<String, List<Int>>) {
         val withExcludedMainList = sameTopicPatches
             .filter { !patchList.contains(it.getInt("number")) }
         if (withExcludedMainList.isNotEmpty()) {
-            println("Common patches for topic \"$topic\":")
-            println(TableView(withExcludedMainList).asString())
+            if (viewType == ViewType.RAW) {
+                print(";")
+            }
+            println("Common patches with topic \"$topic\":")
+            println(getView(viewType, withExcludedMainList).asString())
         }
     }
 }
