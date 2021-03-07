@@ -24,6 +24,7 @@ repositories {
 dependencies {
     implementation("org.json:json:20201115")
     implementation("de.vandermeer:asciitable:0.3.2")
+    implementation("com.github.ajalt.clikt:clikt:3.1.0")
 }
 
 application {

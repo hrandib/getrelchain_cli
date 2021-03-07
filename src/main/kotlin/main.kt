@@ -1,20 +1,32 @@
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
 import kotlin.system.exitProcess
 
-fun main(args: Array<String>) {
-    if(args.isEmpty()) {
-        println("Usage:\n\t getrelchain [ssh profile] [patch id] [-r]")
-        exitProcess(1)
+class CliHandler : CliktCommand(printHelpOnEmptyArgs = true) {
+    private val raw by option(
+        "-r",
+        "--raw",
+        help = "Print output in the raw format (Jenkins patch list)"
+    ).flag()
+    private val sshProfile by argument(help = "SSH config entry (.ssh/config)")
+    private val patchId by argument(help = "Top patch ID in the gerrit relation chain")
+
+    override fun run() {
+        val cmd = GerritSshCommand(sshProfile)
+        val holder = PatchListHolder(cmd, patchId)
+        if (holder.isEmpty()) {
+            println("Something is going wrong, patch list is empty, nothing to print")
+            exitProcess(2)
+        }
+        val resultView: View = if (raw) {
+            RawView(holder.list)
+        } else {
+            TableView(holder.list)
+        }
+        println(resultView.asString())
     }
-    val cmd = GerritSshCommand(args[0])
-    val holder = PatchListHolder(cmd, args[1])
-    if (holder.isEmpty()) {
-        println("Something is going wrong, nothing to print")
-        exitProcess(2)
-    }
-    val resultView: View = if (args.size == 3 && args[2] == "-r") {
-        RawView(holder.list)
-    } else {
-        TableView(holder.list)
-    }
-    println(resultView.asString())
 }
+
+fun main(args: Array<String>) = CliHandler().main(args)
