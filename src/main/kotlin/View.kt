@@ -19,10 +19,22 @@ sealed class View(val patchList: List<JSONObject>) {
 }
 
 class TableView(list: List<JSONObject>) : View(list) {
+    private val excludeTopic: Boolean
+
+    init {
+        val firstTopic = getTopic(patchList.first())
+        //Exclude if all patches in the list contain the same topic or don't have it
+        excludeTopic = patchList.map { getTopic(it) }.all { it == firstTopic }
+    }
+
     override fun asString(): String {
         val t = AsciiTable()
         t.addRule()
-        t.addRow("URL", "Subject", "Topic", "WIP", "TL", "Review", "ML", "Lock")
+        if (excludeTopic) {
+            t.addRow("URL", "Subject","WIP", "TL", "Review", "ML", "Lock")
+        } else {
+            t.addRow("URL", "Subject", "Topic", "WIP", "TL", "Review", "ML", "Lock")
+        }
         t.addRule()
         for (item in patchList) {
             val url = shortenUrl(item.getString("url").orEmpty())
@@ -46,7 +58,11 @@ class TableView(list: List<JSONObject>) : View(list) {
                     "SCA" -> sca += getValue() + " "
                 }
             }
-            t.addRow(url, subj, topic, wip, tl, cr, ml, lock)
+            if (excludeTopic) {
+                t.addRow(url, subj, wip, tl, cr, ml, lock)
+            } else {
+                t.addRow(url, subj, topic, wip, tl, cr, ml, lock)
+            }
         }
         t.addRule()
         t.renderer.cwc = CWC_LongestLine()
