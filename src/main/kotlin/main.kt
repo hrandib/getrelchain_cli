@@ -2,9 +2,11 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import org.json.JSONArray
+import org.json.JSONObject
 import kotlin.system.exitProcess
 
-class CliHandler : CliktCommand(printHelpOnEmptyArgs = true) {
+class CliHandler : CliktCommand(name = "getrelchain", printHelpOnEmptyArgs = true) {
     private val raw by option(
         "-r",
         "--raw",
@@ -28,10 +30,10 @@ class CliHandler : CliktCommand(printHelpOnEmptyArgs = true) {
 
 fun printSameTopic(viewType: ViewType, cmd: SshCommand, topicMap: Map<String, List<Int>>) {
     for ((topic, patchList) in topicMap) {
-        val sameTopicPatches = cmd(Constants.GERRIT_SAMETOPIC_QUERY, topic)
-            .split(", ")
+        val jsonString = cmd(Constants.GERRIT_SAMETOPIC_QUERY, topic)
+        val sameTopicPatches = JSONArray("[$jsonString]")
+            .filterIsInstance<JSONObject>()
             .dropLast(1)
-            .map { it.toJsonObject() }
         val withExcludedMainList = sameTopicPatches
             .filter { !patchList.contains(it.getInt("number")) }
         if (withExcludedMainList.isNotEmpty()) {
