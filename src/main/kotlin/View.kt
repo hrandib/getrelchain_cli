@@ -31,13 +31,15 @@ class TableView(list: List<JSONObject>) : View(list) {
         val t = AsciiTable()
         t.addRule()
         if (excludeTopic) {
-            t.addRow("URL", "Subject","WIP", "TL", "Review", "ML", "Lock")
+            t.addRow("URL", "Subject", "WIP", "TL", "Review", "ML", "Lock")
         } else {
             t.addRow("URL", "Subject", "Topic", "WIP", "TL", "Review", "ML", "Lock")
         }
         t.addRule()
         for (item in patchList) {
-            val url = shortenUrl(item.getString("url").orEmpty())
+            val url = item.getString("url")
+                .orEmpty()
+                .let { if (excludeTopic) it else shortenUrl(it) }
             val subj = item.getString("subject").orEmpty()
             val wip = getWip(item)
             val topic = getTopic(item)
