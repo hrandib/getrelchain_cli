@@ -7,8 +7,8 @@ enum class ViewType {
     TABLE, RAW
 }
 
-fun getView(type: ViewType, list: List<JSONObject>) : View {
-    return when(type) {
+fun getView(type: ViewType, list: List<JSONObject>): View {
+    return when (type) {
         ViewType.TABLE -> TableView(list)
         ViewType.RAW -> RawView(list)
     }
@@ -94,19 +94,25 @@ class TableView(list: List<JSONObject>) : View(list) {
     }
 
     private fun getApprovals(item: JSONObject): List<JSONObject> {
-        return try {
-            (item.getJSONArray("patchSets").last() as JSONObject)
-                .getJSONArray("approvals")
-                .filterIsInstance<JSONObject>()
-        } catch (e: JSONException) {
-            emptyList()
+        val patchSets = item.getJSONArray("patchSets").filterIsInstance<JSONObject>()
+        val approvals = mutableListOf<JSONObject>()
+        for (patchSet in patchSets.asReversed()) {
+            try {
+                approvals.addAll(patchSet.getJSONArray("approvals").filterIsInstance<JSONObject>())
+            } catch (e: JSONException) {
+                break
+            }
+            if (patchSet.getString("kind") != "NO_CODE_CHANGE") {
+                break
+            }
         }
+        return approvals
     }
 
     private fun getTopic(item: JSONObject): String {
         return try {
             item.getString("topic")
-        } catch(e: JSONException) {
+        } catch (e: JSONException) {
             ""
         }
     }
