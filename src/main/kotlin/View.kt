@@ -2,6 +2,7 @@ import de.vandermeer.asciitable.AsciiTable
 import de.vandermeer.asciitable.CWC_LongestLine
 import org.json.JSONException
 import org.json.JSONObject
+import kotlin.system.exitProcess
 
 enum class ViewType {
     TABLE, RAW
@@ -94,17 +95,19 @@ class TableView(list: List<JSONObject>) : View(list) {
     }
 
     private fun getApprovals(item: JSONObject): List<JSONObject> {
+        val kindsThatPreserveApprovals = listOf("NO_CODE_CHANGE", "TRIVIAL_REBASE")
         val patchSets = item.getJSONArray("patchSets").filterIsInstance<JSONObject>()
         val approvals = mutableListOf<JSONObject>()
         for (patchSet in patchSets.asReversed()) {
+            val mergeNextApproval =
+                kindsThatPreserveApprovals.contains(patchSet.getString("kind"))
             try {
-                approvals.addAll(patchSet.getJSONArray("approvals").filterIsInstance<JSONObject>())
+                approvals.addAll(patchSet.getJSONArray("approvals")
+                    .filterIsInstance<JSONObject>())
             } catch (e: JSONException) {
-                break
+                if (!mergeNextApproval) break
             }
-            if (patchSet.getString("kind") != "NO_CODE_CHANGE") {
-                break
-            }
+            if (!mergeNextApproval) break
         }
         return approvals
     }
