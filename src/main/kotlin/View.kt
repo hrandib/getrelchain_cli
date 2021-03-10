@@ -124,7 +124,7 @@ class TableView(list: List<JSONObject>) : View(list) {
 class RawView(list: List<JSONObject>) : View(list) {
     override fun asString(): String {
         val builder = StringBuilder()
-        for (item in patchList) {
+        for (item in patchList.asReversed()) {
             builder.append(item.getString("url"))
                 .append(" ; ")
                 .append(item.getString("subject"))
