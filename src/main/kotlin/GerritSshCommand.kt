@@ -4,9 +4,10 @@ import java.util.concurrent.TimeUnit
 
 object Constants {
     const val GERRIT_PATCHLIST_QUERY: String =
-        "ssh %s gerrit query --dependencies --all-approvals --submit-records --format json %s"
+        "ssh -o ConnectTimeout=6 %s gerrit query" +
+                " --dependencies --all-approvals --submit-records --format json %s"
     const val GERRIT_SAMETOPIC_QUERY: String =
-        """ssh %s gerrit query --all-approvals --format json "topic:{%s}" status:open"""
+        """ssh -o ConnectTimeout=6 %s gerrit query --all-approvals --format json "topic:{%s}" status:open"""
 }
 
 class GerritSshCommand(private val sshProfile: String) : SshCommand {

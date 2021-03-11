@@ -16,7 +16,11 @@ class PatchListHolder(val sshCommand: SshCommand, initialPatch: String) {
 
     private fun initPatchList(patchId: String) {
         fun printFinish() = println("> Finished")
-        val json = sshCommand(Constants.GERRIT_PATCHLIST_QUERY, patchId).toJsonObject()
+        val cmdResult = sshCommand(Constants.GERRIT_PATCHLIST_QUERY, patchId)
+        if (cmdResult.isEmpty()) {
+            return
+        }
+        val json = cmdResult.toJsonObject()
         if (json.getString("status") == "MERGED") {
             printFinish()
             return
