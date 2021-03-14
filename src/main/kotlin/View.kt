@@ -3,23 +3,24 @@ import de.vandermeer.asciitable.CWC_LongestLine
 import org.json.JSONException
 import org.json.JSONObject
 
-enum class ViewType {
-    TABLE, RAW
-}
+enum class ViewType() {
+    TABLE, RAW;
 
-fun getView(type: ViewType, list: List<JSONObject>): View {
-    return when (type) {
-        ViewType.TABLE -> TableView(list)
-        ViewType.RAW -> RawView(list)
+    var excludeSubject: Boolean = false
+
+    fun getView(list: List<JSONObject>): View {
+        return when (this) {
+            TABLE -> TableView(list, excludeSubject)
+            RAW -> RawView(list, excludeSubject)
+        }
     }
 }
 
-sealed class View(val patchList: List<JSONObject>) {
-    var excludeSubject: Boolean = false
+sealed class View(val patchList: List<JSONObject>, val excludeSubject: Boolean = false) {
     abstract fun asString(): String
 }
 
-class TableView(list: List<JSONObject>) : View(list) {
+class TableView(list: List<JSONObject>, excludeSubject: Boolean) : View(list, excludeSubject) {
     private val excludeTopic: Boolean
 
     init {
@@ -123,7 +124,7 @@ class TableView(list: List<JSONObject>) : View(list) {
     }
 }
 
-class RawView(list: List<JSONObject>) : View(list) {
+class RawView(list: List<JSONObject>, excludeSubject: Boolean) : View(list, excludeSubject) {
     override fun asString(): String {
         val builder = StringBuilder()
         for (item in patchList.asReversed()) {

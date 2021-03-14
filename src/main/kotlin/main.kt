@@ -20,7 +20,10 @@ class CliHandler : CliktCommand(name = "getrelchain", printHelpOnEmptyArgs = tru
     private val sshProfile by argument(help = "SSH config entry (.ssh/config)")
     private val patchId by argument(help = "Top patch ID in the gerrit relation chain")
     private val viewType: ViewType
-        get() = if (raw) ViewType.RAW else ViewType.TABLE
+        get() = when (raw) {
+            true -> ViewType.RAW
+            false -> ViewType.TABLE
+        }.also { it.excludeSubject = excludeSubject }
 
     override fun run() {
         val cmd = GerritSshCommand(sshProfile)
@@ -34,9 +37,7 @@ class CliHandler : CliktCommand(name = "getrelchain", printHelpOnEmptyArgs = tru
     }
 
     private fun printMainList(list: List<JSONObject>) {
-        val view = getView(viewType, list)
-        view.excludeSubject = excludeSubject
-        println(view.asString())
+        println(viewType.getView(list).asString())
     }
 
     private fun printSameTopic(cmd: SshCommand, topicMap: Map<String, List<Int>>) {
@@ -52,9 +53,7 @@ class CliHandler : CliktCommand(name = "getrelchain", printHelpOnEmptyArgs = tru
                     print("; ")
                 }
                 println("Common patches with topic \"$topic\":")
-                val view = getView(viewType, withExcludedMainList)
-                view.excludeSubject = excludeSubject
-                println(view.asString())
+                println(viewType.getView(withExcludedMainList).asString())
             }
         }
     }
