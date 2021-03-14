@@ -5,6 +5,7 @@ import java.nio.file.Path.of as withPath
 
 plugins {
     kotlin("jvm") version "1.4.31"
+    id("de.fuerstenau.buildconfig") version "1.1.8"
     application
 }
 
@@ -13,8 +14,13 @@ compileKotlin.kotlinOptions {
     languageVersion = "1.4"
 }
 
-group = "me.dmytro"
-version = "0.4"
+group = "gerrit.app"
+version = "0.5"
+
+buildConfig {
+    appName = project.name
+    version = version
+}
 
 repositories {
     mavenCentral()

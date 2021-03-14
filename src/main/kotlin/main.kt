@@ -2,11 +2,12 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import gerrit.app.BuildConfig
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.system.exitProcess
 
-class CliHandler : CliktCommand(name = "getrelchain", printHelpOnEmptyArgs = true) {
+class CliHandler : CliktCommand(name = BuildConfig.NAME, printHelpOnEmptyArgs = true) {
     private val raw by option(
         "-r",
         "--raw",
@@ -57,6 +58,8 @@ class CliHandler : CliktCommand(name = "getrelchain", printHelpOnEmptyArgs = tru
             }
         }
     }
+
+    override val commandHelpEpilog = "Version: ${BuildConfig.VERSION}"
 }
 
 fun main(args: Array<String>) = CliHandler().main(args)
