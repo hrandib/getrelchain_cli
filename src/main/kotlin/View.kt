@@ -2,7 +2,6 @@ import de.vandermeer.asciitable.AsciiTable
 import de.vandermeer.asciitable.CWC_LongestLine
 import org.json.JSONException
 import org.json.JSONObject
-import kotlin.system.exitProcess
 
 enum class ViewType {
     TABLE, RAW
@@ -16,6 +15,7 @@ fun getView(type: ViewType, list: List<JSONObject>): View {
 }
 
 sealed class View(val patchList: List<JSONObject>) {
+    var excludeSubject: Boolean = false
     abstract fun asString(): String
 }
 
@@ -31,11 +31,11 @@ class TableView(list: List<JSONObject>) : View(list) {
     override fun asString(): String {
         val t = AsciiTable()
         t.addRule()
-        if (excludeTopic) {
-            t.addRow("URL", "Subject", "WIP", "TL", "Review", "ML", "Lock")
-        } else {
-            t.addRow("URL", "Subject", "Topic", "WIP", "TL", "Review", "ML", "Lock")
-        }
+        val rowTitle = mutableListOf("URL")
+        rowTitle.takeIf { !excludeSubject }?.add("Subject")
+        rowTitle.takeIf { !excludeTopic }?.add("Topic")
+        rowTitle.addAll(arrayOf("WIP", "TL", "Review", "ML", "Lock"))
+        t.addRow(rowTitle)
         t.addRule()
         for (item in patchList) {
             val url = item.getString("url")
@@ -61,11 +61,11 @@ class TableView(list: List<JSONObject>) : View(list) {
                     "SCA" -> sca += getValue() + " "
                 }
             }
-            if (excludeTopic) {
-                t.addRow(url, subj, wip, tl, cr, ml, lock)
-            } else {
-                t.addRow(url, subj, topic, wip, tl, cr, ml, lock)
-            }
+            val rowData = mutableListOf(url)
+            rowData.takeIf { !excludeSubject }?.add(subj)
+            rowData.takeIf { !excludeTopic }?.add(topic)
+            rowData.addAll(arrayOf(wip, tl, cr, ml, lock))
+            t.addRow(rowData)
         }
         t.addRule()
         t.renderer.cwc = CWC_LongestLine()
@@ -95,15 +95,17 @@ class TableView(list: List<JSONObject>) : View(list) {
     }
 
     private fun getApprovals(item: JSONObject): List<JSONObject> {
-        val kindsThatPreserveApprovals = listOf("NO_CODE_CHANGE", "TRIVIAL_REBASE")
+        val kindsThatPreserveApprovals = arrayOf("NO_CODE_CHANGE", "TRIVIAL_REBASE")
         val patchSets = item.getJSONArray("patchSets").filterIsInstance<JSONObject>()
         val approvals = mutableListOf<JSONObject>()
         for (patchSet in patchSets.asReversed()) {
             val mergeNextApproval =
                 kindsThatPreserveApprovals.contains(patchSet.getString("kind"))
             try {
-                approvals.addAll(patchSet.getJSONArray("approvals")
-                    .filterIsInstance<JSONObject>())
+                approvals.addAll(
+                    patchSet.getJSONArray("approvals")
+                        .filterIsInstance<JSONObject>()
+                )
             } catch (e: JSONException) {
                 if (!mergeNextApproval) break
             }
@@ -126,9 +128,11 @@ class RawView(list: List<JSONObject>) : View(list) {
         val builder = StringBuilder()
         for (item in patchList.asReversed()) {
             builder.append(item.getString("url"))
-                .append(" ; ")
-                .append(item.getString("subject"))
-                .appendLine()
+            if (!excludeSubject) {
+                builder.append(" ; ")
+                    .append(item.getString("subject"))
+            }
+            builder.appendLine()
         }
         return builder.toString()
     }

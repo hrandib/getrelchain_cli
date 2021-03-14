@@ -54,7 +54,7 @@ class PatchListHolder(val sshCommand: SshCommand, initialPatch: String) {
     private fun getTopic(item: JSONObject): String {
         return try {
             item.getString("topic")
-        } catch(e: JSONException) {
+        } catch (e: JSONException) {
             ""
         }
     }
