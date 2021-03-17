@@ -96,7 +96,7 @@ class TableView(list: List<JSONObject>, excludeSubject: Boolean) : View(list, ex
     }
 
     private fun getApprovals(item: JSONObject): List<JSONObject> {
-        val kindsThatPreserveApprovals = arrayOf("NO_CODE_CHANGE", "TRIVIAL_REBASE")
+        val kindsThatPreserveApprovals = arrayOf("NO_CODE_CHANGE", "TRIVIAL_REBASE", "NO_CHANGE")
         val patchSets = item.getJSONArray("patchSets").filterIsInstance<JSONObject>()
         val approvals = mutableListOf<JSONObject>()
         for (patchSet in patchSets.asReversed()) {
