@@ -15,7 +15,7 @@ compileKotlin.kotlinOptions {
 }
 
 group = "gerrit.app"
-version = "0.5"
+version = "0.5.1"
 
 buildConfig {
     appName = project.name
