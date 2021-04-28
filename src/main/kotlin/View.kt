@@ -45,7 +45,7 @@ class TableView(list: List<JSONObject>, excludeSubject: Boolean) : View(list, ex
             val subj = item.getString("subject").orEmpty()
             val wip = getWip(item)
             val topic = getTopic(item)
-            val approvals = getApprovals(item)
+            val approvals = filterSameUser(getApprovals(item))
             var tl = ""
             var cr = ""
             var lock = ""
@@ -71,6 +71,19 @@ class TableView(list: List<JSONObject>, excludeSubject: Boolean) : View(list, ex
         t.addRule()
         t.renderer.cwc = CWC_LongestLine()
         return t.render()
+    }
+
+    private fun filterSameUser(approvals: List<JSONObject>): List<JSONObject> {
+        val result = mutableMapOf<String, JSONObject>()
+        approvals.forEach {
+            try {
+                result.putIfAbsent(it.getJSONObject("by").getString("username"), it)
+            } catch (e: JSONException) {
+                //skip possible malformed ones
+            }
+        }
+        return result.values.toList()
+
     }
 
     private fun shortenUrl(url: String): String {
