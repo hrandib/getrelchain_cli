@@ -24,7 +24,6 @@ buildConfig {
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
@@ -38,13 +37,20 @@ application {
 }
 
 tasks {
+
+    withType<Wrapper> {
+        gradleVersion = "7.0"
+    }
+
     withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "11"
     }
+
     withType<Jar> {
         manifest {
             attributes["Main-Class"] = application.mainClass
         }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
         //Convert jar file to the directly executable, without the need of 'java -jar' prefix
         doLast {
