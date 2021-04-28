@@ -77,7 +77,9 @@ class TableView(list: List<JSONObject>, excludeSubject: Boolean) : View(list, ex
         val result = mutableMapOf<String, JSONObject>()
         approvals.forEach {
             try {
-                result.putIfAbsent(it.getJSONObject("by").getString("username"), it)
+                result.putIfAbsent(
+                    it.getString("type") + "_" +
+                    it.getJSONObject("by").getString("username"), it)
             } catch (e: JSONException) {
                 //skip possible malformed ones
             }
